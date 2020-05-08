@@ -1,0 +1,385 @@
+<canvas id="gc" width="900" height="600"></canvas>
+<script>
+window.onload=function() {
+
+
+	canv=document.getElementById("gc");
+	ctx=canv.getContext("2d");
+	//canv.addEventListener('mousemove', function(evt){ var mousePos= calculateMousePos(evt);
+							//paddle1Y= mousePos.y-PADDLE_HEIGHT/2;
+							//});
+
+	document.addEventListener("keydown", keyPush);
+
+
+	setInterval(function() {
+				
+				draw();
+				},
+				1000/60);
+	
+}
+
+
+
+
+
+var canv;
+var ctx;
+
+
+
+
+
+
+
+
+
+
+var keyPush = function(evt){
+switch(evt.keyCode)
+	{
+}
+	
+};
+
+
+//Function for drawing lines
+
+var line = function (x1, y1, x2, y2)
+{
+ctx.beginPath();
+ctx.moveTo(x1,y1);
+ctx.lineTo(x2,y2);
+ctx.stroke();
+
+
+}
+
+function showDeck(deck)
+	{
+	canv=document.getElementById("gc");
+	ctx=canv.getContext("2d");
+	//colorRect(0,0, canv.width, canv.height,'skyblue');
+	var cardwidth= (canv.width-65)/13;
+	var cardheight= cardwidth*1.4	;
+	var cardx=1;		// X pos of card
+	var cardy=1;		// Y pos of card
+	var suit=" ";		// suit to print
+	var count=0;		// used to make the output print pretty
+	
+	//for (var i=0; i<deck.length; i++)
+	for (var i=deck.length-1; i>=0; i--)
+	{
+	if((count%13===0) && (count>0))
+		{
+		cardy+=cardheight+5;
+		cardx=1;
+		}
+	colorRect(cardx, cardy, cardwidth, cardheight, 'white');	// Print Card outline
+	switch (deck[i].suit)
+		{
+		case "Hearts":
+		ctx.fillStyle='red';
+		suit="♥";
+		break;
+		case "Diamonds":
+		ctx.fillStyle='red';
+		suit="♦";
+		break;
+		
+		case "Spades":
+		ctx.fillStyle='black';
+		suit="♠";
+		break;
+		
+		case "Clubs":
+		ctx.fillStyle='black';
+		suit="♣";
+		break;
+		}
+	ctx.font = "30px Arial"
+	ctx.fillText(suit,cardx+(cardwidth/2)-10,cardy+(cardheight/2)+10);
+	ctx.fillText(deck[i].name,cardx+(cardwidth/2)-10,cardy+25);
+	ctx.fillText(deck[i].name,cardx+(cardwidth/2) -10,cardy+(cardheight-5));
+	
+	cardx+=cardwidth+5;
+	count++;
+	}
+	};
+
+
+
+function showCard(x,y,card)
+	{
+	cardx=x;
+	cardy=y;
+	var wid= 57 // width of card
+	var ht= 80; // height of card
+	var suit;	// suit of card passed in
+	colorRect(cardx, cardy, wid, ht, 'white');
+	switch(card.suit)
+	{
+		case "Hearts":
+		ctx.fillStyle='red';
+		suit="♥";
+		break;
+		case "Diamonds":
+		ctx.fillStyle='red';
+		suit="♦";
+		break;
+		
+		case "Spades":
+		ctx.fillStyle='black';
+		suit="♠";
+		break;
+		
+		case "Clubs":
+		ctx.fillStyle='black';
+		suit="♣";
+		break;
+		}
+	ctx.font = "30px Arial"
+	ctx.fillText(suit,cardx+(wid/2)-10,cardy+(ht/2)+10);
+	ctx.fillText(card.name,cardx+(wid/2)-10,cardy+25);
+	ctx.fillText(card.name,cardx+(wid/2) -10,cardy+(ht-5));
+	
+	};
+
+
+function shuffle(deck)
+	{
+	var len=deck.length;
+	var temp;		// Temporary spot to hold card
+	var rnd;		// random int to swap cards with 
+	for (var i=0; i<len; i++)
+		{
+		rnd=Math.floor(Math.random()*52);		
+		temp=deck[i];
+		deck[i]=deck[rnd];
+		deck[rnd]=temp; 
+		}
+	return deck;
+	};
+
+
+function deck(){
+	
+	this.names = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+	this.suits= ['Diamonds', 'Hearts', 'Spades', 'Clubs'];
+	var cards=[]
+	for (var s=0; s<this.suits.length; s++)
+		{
+		for(var n=0; n<this.names.length; n++)
+			{
+			cards.push(new card(n+2, this.names[n], this.suits[s]));
+			}
+		}
+	return cards;
+	};
+
+
+
+
+
+class card {
+	constructor(value, name, suit) {
+	this.suit=suit;
+	this.name=name;	
+	this.value=value;
+		}
+	
+	}
+
+
+
+
+var deckA;
+var runonce=true;
+var winavg=0;
+var checked=0;
+var firstCard;
+var nextCard;
+var lower=0;
+var higher=0;
+var same=0;
+var showonce=true;
+var trials=1000;
+var count=0;
+// array off Bias for each card
+var bias = [34,33,33,34,33,33,34,33,33,34,33,33,34,33,33,34,33,33,34,33,33,34,33,33,34,33,33,34,33,33,34,33,33,34,33,33,34,33,33];	
+
+
+
+
+function draw(){
+colorRect(0,0, canv.width, canv.height,'skyblue');
+if(count<trials)
+{
+	if(runonce)
+		{
+		deckA=deck();
+		deckA=shuffle(deckA);
+		firstCard=deckA.pop();
+		runonce=false;
+		}
+showCard(canv.width/2, canv.height/2-150, firstCard);
+showHud();
+showBias();
+if(deckA.length)
+	{
+	nextCard=deckA.pop();
+	if(nextCard.value>firstCard.value)
+		{
+		higher++;
+		bias[firstCard.value -1]
+		}
+	else if(nextCard.value<firstCard.value)
+		{
+		lower++;
+		}
+	else if(nextCard.value==firstCard.value)
+		{
+		same++;
+		}
+	firstCard=nextCard;
+
+	}
+else
+	{
+	deckA.pop();
+	runonce=true;
+	count++;
+	}
+	
+}
+else
+	{
+	if(showonce)
+		{
+		showonce=false;
+		alert("Next Card Higher: " + higher + " Next Card Lower: " + lower + " Next Card Same: " + same);
+		}
+	}
+
+	
+}
+
+
+
+
+
+
+function keyPush(evt) {
+
+
+
+
+}
+
+function colorRect(leftX, TopY, width, height, drawColor)
+{
+	
+	ctx.fillStyle= drawColor;
+	ctx.strokeRect(leftX, TopY, width, height);
+	ctx.fillRect(leftX, TopY, width, height);
+	
+}
+
+
+function drawRect(leftX, TopY, width, height, drawColor)
+{
+	
+	ctx.fillStyle= drawColor;
+	ctx.strokeRect(leftX, TopY, width, height);
+	//ctx.fillRect(leftX, TopY, width, height);
+	
+}
+
+
+
+function colorCircle(centerX, centerY, radius, ballColor)
+{
+	ctx.fillStyle=ballColor;
+	ctx.beginPath();
+	ctx.arc(centerX, centerY, radius, 0, Math.PI*2, true);
+	ctx.fill();
+
+
+}
+
+
+
+function showChoices()
+{
+colorCircle(canv.width/2 -200, canv.height/2 +100, 50, 'blue');
+ctx.font = "30px Arial";
+ctx.fillStyle='black';
+	ctx.fillText("LOWER", canv.width/2-250, canv.height/2 +175);
+	
+colorCircle(canv.width/2, canv.height/2 +100, 50, 'blue');
+ctx.font = "30px Arial";
+ctx.fillStyle='black';
+	ctx.fillText("SAME", canv.width/2-40, canv.height/2 +175);
+
+colorCircle(canv.width/2 +200, canv.height/2 +100, 50, 'blue');
+ctx.font = "30px Arial";
+ctx.fillStyle='black';
+	ctx.fillText("HIGHER", canv.width/2+145, canv.height/2 +175);
+
+
+}
+
+function showHud()
+{
+var size=100;
+colorRect(0, canv.height-size, canv.width, size, 'grey');
+ctx.font = "15px Arial";
+ctx.fillStyle='black';
+	ctx.fillText("LOWER: " + lower, 0, canv.height-size+ 25);
+	ctx.fillText("HIGHER: " + higher, 0, canv.height-size+ 50);
+	ctx.fillText("SAME: " + same, 0, canv.height-size+ 75);
+ctx.font = "30px Arial";
+	ctx.fillText("TRIAL: " + count + " of " + trials, 400, canv.height-size + 25);
+
+}
+
+
+function showBias() // This function will show bar graphs of current biast distributions. 
+{
+var numbias=39;
+var wid=canv.width/numbias;
+var tophud=canv.height-200;
+
+var nms = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+
+for(var i=0; i<numbias; i++)
+	{
+	switch (i%3)
+		{
+		case 0: colorRect(i*wid, tophud+(100-bias[i]), wid, bias[i], 'blue');
+			drawRect(i*wid, tophud, wid*3, 100, 'black');
+			ctx.font = "30px Arial";
+			ctx.fillText(nms[i/3], i*wid +25, tophud-10);
+		break;
+		case 1:	colorRect(i*wid, tophud+(100-bias[i]), wid, bias[i], 'green');
+		break;
+		case 2:	colorRect(i*wid, tophud+(100-bias[i]), wid, bias[i], 'red');
+		break;
+		}
+
+	}
+
+
+
+
+
+
+
+}
+
+
+
+
+</script>
